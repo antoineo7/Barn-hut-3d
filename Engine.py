@@ -1,9 +1,9 @@
 from random import *
 from math import *
 import numpy as np
+from View import *
+from Controller import *
 
-
-# -------Classes---------------
 
 class Body:
     def __init__(self, x, y, z, m, vx, vy, vz, engine):
@@ -47,7 +47,7 @@ class Body:
         return sqrt((self.x - x2) ** 2 + (self.y - y2) ** 2 + (self.z - z2) ** 2)
 
     def get_force(self):
-        return self.fx, self.fy,self.fz
+        return self.fx, self.fy, self.fz
 
     def force_caused_by(self, body2):
         x2, y2, z2 = body2.get_coord()
@@ -186,6 +186,7 @@ class Engine:
     def __init__(self, SIZE_X, SIZE_Y, SIZE_Z,
                  MASSE_MIN, MASSE_MAX, TAILLE_MIN, TAILLE_MAX,
                  THETA, G, VITESSE_MIN, VITESSE_MAX, DT, NBR_PLANETES, EPSILON):
+
         self.SIZE_X = SIZE_X
         self.SIZE_Y = SIZE_Y
         self.SIZE_Z = SIZE_Z
@@ -246,7 +247,7 @@ if __name__=="__main__":
     VITESSE_MIN = 0.00
     VITESSE_MAX = 0.0
     dt = 0.1
-    NBR_PLANETES = 1000
+    NBR_PLANETES = 100
     EPSILON = 2
     engine = Engine(SIZE_X, SIZE_Y, SIZE_Z,
                     MASSE_MIN, MASSE_MAX, TAILLE_MIN, TAILLE_MAX,

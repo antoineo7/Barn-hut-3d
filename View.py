@@ -1,5 +1,6 @@
-from direct.showbase.ShowBase import ShowBase
 from Engine import *
+from direct.showbase.ShowBase import ShowBase
+from Controller import *
 from direct.task import Task
 from panda3d.core import NodePath, TextNode
 from direct.gui.DirectGui import *
@@ -55,9 +56,9 @@ class View(ShowBase):
     def ini_planets(self):
         for x, y, z in self.engine.get_coords():
             self.bodies.append(self.loader.loadModel("models/planet_sphere"))
-            self.bodies[-1].setTexture(self.textures[randint(0,7)], 1)
+            self.bodies[-1].setTexture(self.textures[randint(0, 7)], 1)
             self.bodies[-1].reparentTo(self.render)
-            self.bodies[-1].setScale(1, 1, 1)
+            self.bodies[-1].setScale(0.25, 0.25, 0.25)
             self.bodies[-1].setPos(x, y, z)
 
     def animate_planet(self, task):
@@ -103,7 +104,7 @@ G = 0.1
 VITESSE_MIN = 0.00
 VITESSE_MAX = 0.0
 dt = 0.01
-NBR_PLANETES = 10
+NBR_PLANETES = 1000
 EPSILON = 2
 engine = Engine(SIZE_X, SIZE_Y, SIZE_Z,
                 MASSE_MIN, MASSE_MAX, TAILLE_MIN, TAILLE_MAX,
