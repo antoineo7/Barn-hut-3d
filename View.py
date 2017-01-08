@@ -1,5 +1,6 @@
-from direct.showbase.ShowBase import ShowBase
 from Engine import *
+from direct.showbase.ShowBase import ShowBase
+from Controller import *
 from direct.task import Task
 from panda3d.core import NodePath, TextNode
 from direct.gui.DirectGui import *
@@ -9,19 +10,24 @@ import sys
 
 class View(ShowBase):
 
-    def __init__(self, engine):
+    def __init__(self, engine, from_file=False, file_name=None):
         ShowBase.__init__(self)
 
         self.engine = engine
 
-        self.camera.setPos(SIZE_X / 2.0, SIZE_Y / 2.0, 0)
+        self.camera.setPos(self.engine.SIZE_X / 2.0, self.engine.SIZE_Y / 2.0, 250)
         self.camera.setHpr(0, 90, 0)
         self.disableMouse()
         self.setBackgroundColor(0, 0, 0)
         self.textures = [self.loader.loadTexture("models/"+str(k)+".jpg") for k in range(1,9)]
         self.bodies = []
-        self.ini_planets()
         self.taskMgr.add(self.animate_planet, "AnimatePlanet")
+        self.from_file = from_file
+        if file_name is None:
+            self.file = None
+        else:
+            self.file = open(file_name, 'r')
+        self.ini_planets()
 
         # Keys handler initialization :
         # Space bar allows to control the camera rotation, whereas the arrow keys control the x,z translation
@@ -53,17 +59,37 @@ class View(ShowBase):
                                              scale=0.04, fg=(255, 255, 255, 1), align=TextNode.ACenter, mayChange=1)
 
     def ini_planets(self):
-        for x, y, z in self.engine.get_coords():
-            self.bodies.append(self.loader.loadModel("models/planet_sphere"))
-            self.bodies[-1].setTexture(self.textures[randint(0,7)], 1)
-            self.bodies[-1].reparentTo(self.render)
-            self.bodies[-1].setScale(1, 1, 1)
-            self.bodies[-1].setPos(x, y, z)
+        if not self.from_file:
+            for x, y, z in self.engine.get_coords():
+                self.bodies.append(self.loader.loadModel("models/planet_sphere"))
+                self.bodies[-1].setTexture(self.textures[randint(0, 7)], 1)
+                self.bodies[-1].reparentTo(self.render)
+                self.bodies[-1].setScale(0.05)
+                self.bodies[-1].setPos(x, y, z)
+        else:
+            tmp2 = self.file.readline().split(";")[:-1]
+            if len(tmp2)!=self.engine.NBR_PLANETES:
+                print("N-Bodies from engine parameters and file don't match ")
+            for str_tuple in tmp2:
+                tmp = str_tuple.split(",")
+                x, y, z = float(tmp[0]), float(tmp[1]), float(tmp[2])
+                self.bodies.append(self.loader.loadModel("models/planet_sphere"))
+                self.bodies[-1].setTexture(self.textures[randint(0, 7)], 1)
+                self.bodies[-1].reparentTo(self.render)
+                self.bodies[-1].setScale(0.05)
+                self.bodies[-1].setPos(x, y, z)
 
     def animate_planet(self, task):
-        self.engine.timestep()
-        for (x, y, z), body in zip(self.engine.get_coords(), self.bodies):
-            body.setPos(x, y, z)
+        if not self.from_file:
+            self.engine.timestep()
+            for (x, y, z), body in zip(self.engine.get_coords(), self.bodies):
+                body.setPos(x, y, z)
+        else:
+            for str_tuple, body in zip(self.file.readline().split(";")[:-1],self.bodies):
+                tmp = str_tuple.split(",")
+                x, y, z = float(tmp[0]), float(tmp[1]), float(tmp[2])
+                body.setPos(x, y, z)
+
 
         newPosx, newPosy, newPosz = self.camera.getPos()
         newAnglex, newAngley, newAnglez = self.camera.getHpr()
@@ -87,26 +113,26 @@ class View(ShowBase):
         self.keys[key] = val
 
     def reset_camera(self):
-        self.camera.setPos(SIZE_X / 2.0, SIZE_Y / 2.0, 0)
+        self.camera.setPos(self.engine.SIZE_X / 2.0, self.engine.SIZE_Y / 2.0, 0)
         self.camera.setHpr(0, 90, 0)
 
-
-SIZE_X = 1300
-SIZE_Y = 600
-SIZE_Z = 600
-MASSE_MIN = 1000
-MASSE_MAX = 10000
-TAILLE_MIN = 3
-TAILLE_MAX = 7
-THETA = 0.8
-G = 0.1
-VITESSE_MIN = 0.00
-VITESSE_MAX = 0.0
-dt = 0.01
-NBR_PLANETES = 10
-EPSILON = 2
-engine = Engine(SIZE_X, SIZE_Y, SIZE_Z,
-                MASSE_MIN, MASSE_MAX, TAILLE_MIN, TAILLE_MAX,
-                THETA, G, VITESSE_MIN, VITESSE_MAX, dt, NBR_PLANETES, EPSILON)
-app = View(engine)
-app.run()
+if __name__ == "__main__":
+    SIZE_X = 1300
+    SIZE_Y = 600
+    SIZE_Z = 600
+    MASSE_MIN = 1000
+    MASSE_MAX = 10000
+    TAILLE_MIN = 3
+    TAILLE_MAX = 7
+    THETA = 0.8
+    G = 0.1
+    VITESSE_MIN = 0.00
+    VITESSE_MAX = 0.0
+    dt = 0.01
+    NBR_PLANETES = 5
+    EPSILON = 2
+    engine = Engine(SIZE_X, SIZE_Y, SIZE_Z,
+                    MASSE_MIN, MASSE_MAX, TAILLE_MIN, TAILLE_MAX,
+                    THETA, G, VITESSE_MIN, VITESSE_MAX, dt, NBR_PLANETES, EPSILON)
+    app = View(engine)
+    app.run()
