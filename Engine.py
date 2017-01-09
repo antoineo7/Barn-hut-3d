@@ -182,9 +182,9 @@ class Quadtree:
 
 
 class Engine:
-    def __init__(self, SIZE_X, SIZE_Y, SIZE_Z,
-                 MASSE_MIN, MASSE_MAX, TAILLE_MIN, TAILLE_MAX,
-                 THETA, G, VITESSE_MIN, VITESSE_MAX, DT, NBR_PLANETES, EPSILON):
+    def __init__(self, params):
+        SIZE_X, SIZE_Y, SIZE_Z, MASSE_MIN, MASSE_MAX, TAILLE_MIN, TAILLE_MAX \
+            , THETA, G, VITESSE_MIN, VITESSE_MAX, DT, NBR_PLANETES, EPSILON = params
 
         self.SIZE_X = SIZE_X
         self.SIZE_Y = SIZE_Y

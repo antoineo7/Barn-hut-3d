@@ -94,8 +94,8 @@ class View(ShowBase):
         newPosx, newPosy, newPosz = self.camera.getPos()
         newAnglex, newAngley, newAnglez = self.camera.getHpr()
 
-        newPosx += self.keys['turnLeft']
-        newPosx -= self.keys['turnRight']
+        newPosx -= self.keys['turnLeft']
+        newPosx += self.keys['turnRight']
         newPosz += self.keys['up']
         newPosz -= self.keys['down']
 

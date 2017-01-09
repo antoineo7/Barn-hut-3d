@@ -36,4 +36,4 @@ if __name__ == '__main__':
                     MASSE_MIN, MASSE_MAX, TAILLE_MIN, TAILLE_MAX,
                     THETA, G, VITESSE_MIN, VITESSE_MAX, dt, NBR_PLANETES, EPSILON)
 
-    write_to_file("circle2kvit.txt",100,engine,verbose=True)
+    write_to_file("simulation/circle2kvit.txt",100,engine,verbose=True)
