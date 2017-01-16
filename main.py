@@ -11,6 +11,6 @@ view2 = View2(controller)
 
 controller.set_view(view2)
 controller.run()
-print("ok")
+
 
 
