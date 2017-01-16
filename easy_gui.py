@@ -27,12 +27,13 @@ if mode == 'Live':
                 loop = not easygui.ynbox("This file already exists. Do you want to overwrite file ?")
             else :
                 loop = False
-        print(file_name,os.listdir('simulation/'))
+        section_name = file_name[11:]
 
     else:
         file_name = None
-    create_ini_section("Section easygui", nbr_bodies, theta)
-    engine = Engine(read_params("Section easygui"),write_to_file=write_to_file,file_name=file_name)
+        section_name = "Section easygui"
+    create_ini_section(section_name, nbr_bodies, theta)
+    engine = Engine(read_params(section_name),write_to_file=write_to_file,file_name=file_name)
     controller = Controller(engine)
     view = View(controller)
     controller.set_view(view)
