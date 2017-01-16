@@ -1,7 +1,6 @@
 from random import *
 from math import *
 import numpy as np
-from Controller import *
 
 
 class Body:
@@ -66,7 +65,7 @@ class Body:
             self.fy += fy1
             self.fz += fz1
             return
-        sx, sy, sz = tab[1].get_size()   #####
+        sx, sy, sz = tab[1].get_size()
         bodyeq = Body(tab[4][0], tab[4][1], tab[4][2], tab[3], 0, 0, 0,self.engine)
         d = self.get_dist(bodyeq)
         if d != 0:
