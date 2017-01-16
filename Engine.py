@@ -82,7 +82,7 @@ class Body:
     def act_forces_vit_pos(self, quadtree):
         """
 
-        :type quadtree: Quadtree
+        :type quadtree: Octree
         """
         self.fx = 0
         self.fy = 0
@@ -96,10 +96,10 @@ class Body:
         self.z += self.vz * self.engine.DT
 
     def is_in_ecran(self):
-        return self.is_in_quad(Quadrant(0, 0, 0, self.engine.SIZE_X, self.engine.SIZE_Y, self.engine.SIZE_Z, self.engine))
+        return self.is_in_quad(Octant(0, 0, 0, self.engine.SIZE_X, self.engine.SIZE_Y, self.engine.SIZE_Z, self.engine))
 
 
-class Quadrant:
+class Octant:
     def __init__(self, x, y, z, lx, ly, lz, engine):
         self.x_upleft = x
         self.y_upleft = y
@@ -122,22 +122,22 @@ class Quadrant:
         x2 = self.x_upleft + lx2
         y2 = self.y_upleft + ly2
         z2 = self.z_upleft + lz2
-        return [Quadrant(self.x_upleft, self.y_upleft, self.z_upleft, lx2, ly2, lz2, self.engine),
-                Quadrant(x2, self.y_upleft, self.z_upleft, lx2, ly2, lz2, self.engine),
-                Quadrant(self.x_upleft, y2, self.z_upleft, lx2, ly2, lz2, self.engine),
-                Quadrant(x2, y2, self.z_upleft, lx2, ly2, lz2, self.engine),
-                Quadrant(self.x_upleft, self.y_upleft, z2, lx2, ly2, lz2, self.engine),
-                Quadrant(x2, self.y_upleft, z2, lx2, ly2, lz2, self.engine),
-                Quadrant(self.x_upleft, y2, z2, lx2, ly2, lz2, self.engine),
-                Quadrant(x2, y2, z2, lx2, ly2, lz2, self.engine)]
+        return [Octant(self.x_upleft, self.y_upleft, self.z_upleft, lx2, ly2, lz2, self.engine),
+                Octant(x2, self.y_upleft, self.z_upleft, lx2, ly2, lz2, self.engine),
+                Octant(self.x_upleft, y2, self.z_upleft, lx2, ly2, lz2, self.engine),
+                Octant(x2, y2, self.z_upleft, lx2, ly2, lz2, self.engine),
+                Octant(self.x_upleft, self.y_upleft, z2, lx2, ly2, lz2, self.engine),
+                Octant(x2, self.y_upleft, z2, lx2, ly2, lz2, self.engine),
+                Octant(self.x_upleft, y2, z2, lx2, ly2, lz2, self.engine),
+                Octant(x2, y2, z2, lx2, ly2, lz2, self.engine)]
 
     def description(self):
-        print("Ce Quadrant a pour coordonnees ", (self.x_upleft, self.y_upleft,self.z_upleft), " et une longueur de ",
+        print("Ce Octant a pour coordonnees ", (self.x_upleft, self.y_upleft,self.z_upleft), " et une longueur de ",
               self.size_x, self.size_y, self.size_z, ".")
         pass
 
 
-class Quadtree:
+class Octree:
     def __init__(self, root_quad, engine):
         self.tree = [None, root_quad, {}, 0, (None, None)]  # [body,quad,subdivisions,total mass,center of mass]
         self.quadleaf = []
@@ -181,9 +181,9 @@ class Quadtree:
 
 
 class Engine:
-    def __init__(self, params):
+    def __init__(self, params,write_to_file=False,file_name=None):
         SIZE_X, SIZE_Y, SIZE_Z, MASSE_MIN, MASSE_MAX, TAILLE_MIN, TAILLE_MAX \
-            , THETA, G, VITESSE_MIN, VITESSE_MAX, DT, NBR_PLANETES, EPSILON = params
+            , G, VITESSE_MIN, VITESSE_MAX, DT, EPSILON, NBR_PLANETES, THETA = params
 
         self.SIZE_X = SIZE_X
         self.SIZE_Y = SIZE_Y
@@ -201,6 +201,12 @@ class Engine:
         self.NBR_PLANETES = NBR_PLANETES
         self.EPSILON = EPSILON
         self.planetes = []
+        self.write_to_file = write_to_file
+        if file_name is None:
+            self.file = None
+        else:
+            self.file = open(file_name, 'w')
+
         for i in range(self.NBR_PLANETES):
             theta = 2 * pi * random()
             phi = pi * random()
@@ -215,12 +221,12 @@ class Engine:
                      (self.MASSE_MAX - self.MASSE_MIN) * random() + self.MASSE_MIN, v * cos(theta) * sin(phi),
                      v * sin(theta) * sin(phi),
                      v * cos(phi), self))
-        self.quadtree = Quadtree(Quadrant(0, 0, 0, self.SIZE_X, self.SIZE_Y, self.SIZE_Z, self), self)
+        self.quadtree = Octree(Octant(0, 0, 0, self.SIZE_X, self.SIZE_Y, self.SIZE_Z, self), self)
         for planete in self.planetes:
             self.quadtree.add_body(planete)
 
     def timestep(self):
-        self.quadtree = Quadtree(Quadrant(0, 0, 0, self.SIZE_X, self.SIZE_Y, self.SIZE_Z, self), self)
+        self.quadtree = Octree(Octant(0, 0, 0, self.SIZE_X, self.SIZE_Y, self.SIZE_Z, self), self)
         for planete in self.planetes:
             if not planete.is_in_ecran():
                 self.planetes.remove(planete)
@@ -228,6 +234,12 @@ class Engine:
                 self.quadtree.add_body(planete)
         for planete in self.planetes:
             planete.act_forces_vit_pos(self.quadtree)
+        if self.write_to_file:
+            s = self.get_coords()
+            string = ""
+            for tuple in s:
+                string += str(tuple)[1:-1] + ";"
+            self.file.write(string + "\n")
 
     def get_coords(self):
         return [planete.get_coord() for planete in self.planetes]

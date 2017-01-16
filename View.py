@@ -30,10 +30,11 @@ class View(ShowBase):
         # This light is facing backwards, towards the camera.
         self.directionalLightNP.setHpr(500, 200, 200)
         self.render.setLight(self.directionalLightNP)
-        self.thetaParam = DirectSlider(range=(0, 1), value=0.8, pageSize=3,
+        if not from_file:
+            self.thetaParam = DirectSlider(range=(0, 1), value=self.controller.get_theta_parameter(), pageSize=3,
                                        command=self.setValue, pos=(0.95,0,0.9))
-        self.thetaParam.set_scale(0.2)
-        self.label = OnscreenText(text="Theta parameter", pos=(0.95, 0.95),
+            self.thetaParam.set_scale(0.2)
+            self.label = OnscreenText(text="Theta parameter", pos=(0.95, 0.95),
                      scale=0.04, fg=(255, 255, 255, 1), align=TextNode.ACenter, mayChange=1)
 
 
