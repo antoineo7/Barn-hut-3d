@@ -6,6 +6,7 @@ from panda3d.core import *
 from direct.gui.DirectGui import *
 from random import *
 import sys
+import math
 from panda3d.core import loadPrcFileData
 
 
@@ -111,12 +112,24 @@ class View(ShowBase):
 
 
         newPosx, newPosy, newPosz = self.camera.getPos()
-        newAnglex, newAngley, newAnglez = self.camera.getHpr()
+        newAnglexint, newAngleyint, newAnglezint = self.camera.getHpr()
+        newAnglex,newAngley,newAnglez = float(newAnglexint),float(newAngleyint),float(newAnglezint)
+        norm = float(math.sqrt(newAnglex**2+newAngley**2+newAnglez**2))
+        dx,dy,dz = newAnglex/norm,newAngley/norm,newAnglez/norm
+
+        if self.keys['up'] and not self.keys['hold']:
+            newPosx+=dz
+            newPosy+=dx
+            newPosz+=dy
+        if self.keys['down'] and not self.keys['hold']:
+            newPosx -= dz
+            newPosy -= dx
+            newPosz -= dy
+
+
 
         newPosx -= self.keys['turnLeft']
         newPosx += self.keys['turnRight']
-        newPosz += self.keys['up']
-        newPosz -= self.keys['down']
 
         newAngley += (self.keys['hold'] == 1) * self.keys['up']
         newAngley -= (self.keys['hold'] == 1) * self.keys['down']

@@ -5,7 +5,14 @@ from Engine import *
 from View import *
 import os
 
-mode = easygui.buttonbox('Choose your mode', 'N Body Simulator', ('Live', 'PreCalc'))
+mode = easygui.buttonbox('Choose your mode', 'N Body Simulator', ('Live', 'PreCalc','Quick Simul'))
+if mode == 'Quick Simul':
+    engine = Engine(read_params("default"))
+    controller = Controller(engine)
+    view = View(controller)
+    controller.set_view(view)
+    controller.run()
+
 if mode is None:
     exit()
 if mode == 'Live':
